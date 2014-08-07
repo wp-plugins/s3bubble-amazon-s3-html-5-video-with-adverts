@@ -69,25 +69,15 @@ Remember if you need any extra help you can visit our friendly [support forum](h
 
 = These are auto generated within your s3bubble admin =
 
-**Audio Playlist Shortcode Example.**
-`[s3bubbleAudio bucket="enter-your-bucket" folder="enter-your-bucket-folder"]`
-
-**Audio Single Player Shortcode Example.**
-`[s3bubbleAudioSingle bucket="enter-your-bucket" track="enter-your-track-name"]`
-
-**Video Playlist Shortcode Example.**
-`[s3bubbleVideo bucket="enter-your-bucket" folder="enter-your-bucket-folder"]`
-
-**Video Single Player Shortcode Example.**
-`[s3bubbleVideoSingle bucket="enter-your-bucket" track="enter-your-track-name"]`
+**Video Shortcode Example.**
+`[s3bubbleVideoAdvert bucket="enter-your-bucket" key="enter-your-object"]`
 
 = Params - these can be added to the shortcode =
 * bucket: //your amazon bucket
-* folder: //your amazon s3 folder
+* object: //your amazon s3 folder
 * autoplay: //true or false 
-* height: //height of the player
-* playlist: //hidden
-* style: plain //hide bar on single audio player 
+* time: //time of skip
+* apect: //video aspect ration
 
 == Frequently Asked Questions ==
 
@@ -97,9 +87,7 @@ Once you’ve installed the plug-in, the S3 Bubble Tutorial will guide you along
 S3Bubble is a media streaming service that allows you to serve video, audio and images from your Amazon S3 account to a widget that can be embedded within wordpress.
 
 **How much does it cost?**
-[You can sign up for a 28 day free trial of the service here >](https://s3bubble.com/auth/?action=register&utm_source=wordpress&utm_medium=link&utm_campaign=wordpresspluginpage "S3bubble")
-
-S3Bubble costs from $5.99-$7.99 p/month plus the costs of your hosting with Amazon S3 (detailed below). For this you get an unbranded player, unlimited media streaming and all the back end tools to manage your files.
+[S3Bubble is completely free for on application >](https://s3bubble.com/auth/?action=register&utm_source=wordpress&utm_medium=link&utm_campaign=wordpresspluginpage "S3bubble")
 
 **What’s Amazon S3?**
 Amazon S3 is a cloud storage platform, that charges on a per-usage basis. Essentially, a very cheap way to store and share large amounts of data. [Check their pricing out here >](http://aws.amazon.com/s3/pricing/ "S3bubble Amazon S3 Pricing")
