@@ -41,11 +41,7 @@ Download the plugin or Sign Up for an account at [S3Bubble](https://s3bubble.com
 * Tested with IE (7-10), Chrome, Safari and Firefox
 * Responsive player, resizes based on fluid grids
 * Range of Player options
-* Audio Playlists
-* Single Audio Player
-* Video Playlists
 * Single Video Player
-* Download options e.g. Only allow logged in users to D/load file
 * Simple Shortcodes (full options on Plug-In Admin Page)
 * Friendly support forum - support from our Developers and current members
 
