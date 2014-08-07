@@ -8,7 +8,7 @@ Stable tag: 0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-S3Bubble offers simple, secure media streaming from Amazon S3 Cloudfront RTMP to Wordpress all in just 4 simple steps!
+S3Bubble offers simple, secure media streaming from Amazon S3 to WordPress and adding your very own adverts. In just 4 simple steps!
 
 == Description ==
 
