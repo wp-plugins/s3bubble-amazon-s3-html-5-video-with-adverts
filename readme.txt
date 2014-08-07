@@ -34,7 +34,7 @@ Hosting video, galleries and audio files is heavyweight work. S3Bubble adds powe
 
 Download the plugin or Sign Up for an account at [S3Bubble](https://s3bubble.com/auth/?action=register&utm_source=wordpress&utm_medium=link&utm_campaign=wordpresspluginpage "S3bubble")
 
-[youtube https://www.youtube.com/watch?v=EyBTpJ9GJCw]
+[youtube https://www.youtube.com/watch?v=z3DZ1fpXR0I]
 
 = Features: =
 * HTML 5 Player (Supports iOS, Web, Android, Windows Phone etc.)
@@ -65,7 +65,7 @@ Once you’ve installed the S3Bubble plug-in, you’ll need to create an S3Bubbl
 
 Remember if you need any extra help you can visit our friendly [support forum](https://s3bubble.com/forums/?utm_source=wordpress&utm_medium=link&utm_campaign=s3bubbleforum "problems").
 
-[youtube https://www.youtube.com/watch?v=EyBTpJ9GJCw]
+[youtube https://www.youtube.com/watch?v=z3DZ1fpXR0I]
 
 = These are auto generated within your s3bubble admin =
 
