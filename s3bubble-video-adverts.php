@@ -36,7 +36,7 @@ if (!class_exists("s3bubble_video_adverts")) {
 		 */ 
         public  $s3bubble_video_adverts_accesskey  = '';
 		public  $s3bubble_video_adverts_secretkey  = '';
-		public  $version                           = 18;
+		public  $version                           = 3;
 		private $endpoint                          = 'https://api.s3bubble.com/';
 		
 		/*
@@ -155,8 +155,8 @@ if (!class_exists("s3bubble_video_adverts")) {
 	            wp_enqueue_script('jquery-migrate');
 				wp_register_script( 's3player.adverts.jplayer.min', plugins_url('assets/js/s3player.adverts.jplayer.min.js',__FILE__ ), array(), $this->version );
 	            wp_enqueue_script('s3player.adverts.jplayer.min');
-				wp_register_script( 's3player.adverts.easydeploy.min', plugins_url('assets/js/s3player.adverts.easydeploy.min.js',__FILE__ ), array(), $this->version );
-	            wp_enqueue_script('s3player.adverts.easydeploy.min');
+				wp_register_script( 's3player.adverts.s3bubble.min', plugins_url('assets/js/s3player.adverts.s3bubble.min.js',__FILE__ ), array(), $this->version );
+	            wp_enqueue_script('s3player.adverts.s3bubble.min');
             } 
 		}
 
@@ -439,7 +439,7 @@ if (!class_exists("s3bubble_video_adverts")) {
 		   $result = json_decode(curl_exec($ch));
            $player_id = uniqid();
 
-           return '<div id="uniquePlayer-' . $player_id . '" class="mediaPlayer mediaAdvert-' . $player_id . ' darkskin"><img class="s3bubble-video-advert-loading" src="https://isdcloud.s3.amazonaws.com/ajax_loaders/712.GIF" /><div id="uniqueContainer-' . $player_id . '" class="Player"></div></div>
+           return '<div id="uniquePlayer-' . $player_id . '" class="mediaPlayer mediaAdvert-' . $player_id . ' darkskin"><div class="s3bubble-video-advert-loading"></div><div id="uniqueContainer-' . $player_id . '" class="Player"></div></div>
             <script type="text/javascript">
 			jQuery(document).ready(function($) {
 				var aspect  = "' . $aspect . '";
