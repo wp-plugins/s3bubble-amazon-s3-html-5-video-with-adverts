@@ -3,7 +3,7 @@
 Plugin Name: S3Bubble Amazon S3 HTML 5 Video With Adverts
 Plugin URI: https://www.s3bubble.com/
 Description: S3Bubble offers simple, secure media streaming from Amazon S3 to WordPress and adding your very own adverts. In just 4 simple steps. 
-Version: 0.1
+Version: 0.2
 Author: S3Bubble
 Author URI: https://s3bubble.com/
 License: GPL2
@@ -36,8 +36,8 @@ if (!class_exists("s3bubble_video_adverts")) {
 		 */ 
         public  $s3bubble_video_adverts_accesskey  = '';
 		public  $s3bubble_video_adverts_secretkey  = '';
-		public  $version                   = 17;
-		private $endpoint                  = 'https://api.s3bubble.com/';
+		public  $version                           = 18;
+		private $endpoint                          = 'https://api.s3bubble.com/';
 		
 		/*
 		 * Constructor method to intiat the class
@@ -155,7 +155,7 @@ if (!class_exists("s3bubble_video_adverts")) {
 	            wp_enqueue_script('jquery-migrate');
 				wp_register_script( 's3player.adverts.jplayer.min', plugins_url('assets/js/s3player.adverts.jplayer.min.js',__FILE__ ), array(), $this->version );
 	            wp_enqueue_script('s3player.adverts.jplayer.min');
-				wp_register_script( 's3player.adverts.easydeploy.min', plugins_url('assets/js/s3player.adverts.easydeploy.js',__FILE__ ), array(), $this->version );
+				wp_register_script( 's3player.adverts.easydeploy.min', plugins_url('assets/js/s3player.adverts.easydeploy.min.js',__FILE__ ), array(), $this->version );
 	            wp_enqueue_script('s3player.adverts.easydeploy.min');
             } 
 		}
@@ -439,7 +439,7 @@ if (!class_exists("s3bubble_video_adverts")) {
 		   $result = json_decode(curl_exec($ch));
            $player_id = uniqid();
 
-           return '<div id="uniquePlayer-' . $player_id . '" class="mediaPlayer darkskin"><div id="uniqueContainer-' . $player_id . '" class="Player"></div></div>
+           return '<div id="uniquePlayer-' . $player_id . '" class="mediaPlayer mediaAdvert-' . $player_id . ' darkskin"><img class="s3bubble-video-advert-loading" src="https://isdcloud.s3.amazonaws.com/ajax_loaders/712.GIF" /><div id="uniqueContainer-' . $player_id . '" class="Player"></div></div>
             <script type="text/javascript">
 			jQuery(document).ready(function($) {
 				var aspect  = "' . $aspect . '";
@@ -451,12 +451,13 @@ if (!class_exists("s3bubble_video_adverts")) {
 				var autoplay = "' . $autoplay . '";
 				if(advert !== "null" && advert !== ""){
 					var advertOnce = true;
-					$(".mediaPlayer").mediaPlayer({
+					$(".mediaAdvert-' . $player_id . '").mediaPlayer({
 						media: {
 							m4v: "' . $result[0]->advert . '",
 							poster: "' . $result[0]->thumbImg . '"
 						},
 	                    ended: function () {
+	                    	$(".s3bubble-video-advert-loading").fadeIn();
 	                    	$(".skipAdvert").hide(); 
 							$("#uniqueContainer-' . $player_id . '").jPlayer("setMedia", {
 								m4v: "' . $result[0]->mp4 . '",
@@ -468,14 +469,10 @@ if (!class_exists("s3bubble_video_adverts")) {
 							width: "100%",
 							height: valueHeight
 						},
-	                    swfPath: "https://s3bubble.com/wp-content/themes/s3audible/watch/src/js",
 						loadstart: function() {
 							if(autoplay === "true"){
 								$("#uniqueContainer-' . $player_id . '").jPlayer( "play" );
 							}
-						},
-						playing: function() {
-							
 						}
 					});
 					$("video").bind("contextmenu", function(e) {
@@ -511,11 +508,12 @@ if (!class_exists("s3bubble_video_adverts")) {
 								poster: "' . $result[0]->thumbImg . '"
 							});
 							$("#uniqueContainer-' . $player_id . '").jPlayer( "play" );
+							$(".s3bubble-video-advert-loading").fadeIn();
 						}
 						return false;
 					});
 				}else{
-					$(".mediaPlayer").mediaPlayer({
+					$(".mediaAdvert-' . $player_id . '").mediaPlayer({
 						media: {
 							m4v: "' . $result[0]->mp4 . '",
 							poster: "' . $result[0]->thumbImg . '"
@@ -524,14 +522,10 @@ if (!class_exists("s3bubble_video_adverts")) {
 							width: "100%",
 							height: valueHeight
 						},
-	                    swfPath: "https://s3bubble.com/wp-content/themes/s3audible/watch/src/js",
 						loadstart: function() {
 							if(autoplay === "true"){
 								$("#uniqueContainer-' . $player_id . '").jPlayer( "play" );
 							}
-						},
-						playing: function() { 
-							
 						}
 					});
 				}

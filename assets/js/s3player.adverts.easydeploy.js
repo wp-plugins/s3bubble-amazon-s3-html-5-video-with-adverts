@@ -6,7 +6,6 @@
 
 		var playerGUI = "#" + $(this).attr('id');
 		var playerID  = "#" + $(this).find('.Player').attr('id');
-		console.log('JSON parse ERROR, fall back to JS!');
 		var settings = extras;
 
 		var HTMLContent = $('<div class="playerScreen">\
@@ -105,8 +104,8 @@
 			},
 
 			// Extra Settings
-			swfPath: "js/Jplayer.swf",
-			supplied: formats,
+			swfPath: "https://soaudible.s3.amazonaws.com/audio/Jplayer.swf",
+			supplied: "m4v",
 			solution: 'html, flash',
 			volume: cVolume,
 			size: settings.size,
@@ -142,13 +141,26 @@
 				$(playerGUI + ' .video-play').fadeOut();
 				$(this).on('click', function() { $(mainPlayer).jPlayer('pause');});
 				$(this).jPlayer("pauseOthers");
+				
 			},
 
 			pause: function() {
 				$(playerGUI + ' .video-play').fadeIn();
 				$(playerGUI + ' .playerScreen').unbind('click');
 			},
-
+			
+			loadedmetadata : function(t) {
+				$(playerGUI + ".s3bubble-video-advert-loading").fadeOut();
+			},
+			loadeddata : function(t) {
+				$(playerGUI + " .s3bubble-video-advert-loading").fadeOut();
+			},
+			emptied : function(t) {
+				$(playerGUI + ".s3bubble-video-advert-loading").fadeIn();
+			},
+			stalled : function(t) {
+				$(playerGUI + ".s3bubble-video-advert-loading").fadeIn();
+			},
 			volumechange: function(event) {        
 				if(event.jPlayer.options.muted) {
 					$(playerGUI + ' .currentVolume').val(0);
@@ -161,6 +173,9 @@
 
 			timeupdate: function(event) {
 				$(playerGUI + ' .seekBar').val(event.jPlayer.status.currentPercentRelative);
+				if (event.jPlayer.status.currentTime > 1) {
+					$(".s3bubble-video-advert-loading").fadeOut();
+				}
 			},
 
 		};

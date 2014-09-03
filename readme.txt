@@ -4,7 +4,7 @@ Donate link: https://s3bubble.com
 Tags: S3Bubble, S3 Bubble, Amazon, AmazonS3, Amazon S3, HTML 5 Player, HTML5 Player, HTML5Player, Video, VideoPlayer, Video-Player, Video player, Media, MediaPlayer
 Requires at least: 2.0
 Tested up to: 3.9.1
-Stable tag: 0.1
+Stable tag: 0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
