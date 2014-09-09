@@ -3,7 +3,7 @@
 Plugin Name: S3Bubble Amazon S3 HTML 5 Video With Adverts
 Plugin URI: https://www.s3bubble.com/
 Description: S3Bubble offers simple, secure media streaming from Amazon S3 to WordPress and adding your very own adverts. In just 4 simple steps. 
-Version: 0.2
+Version: 0.3
 Author: S3Bubble
 Author URI: https://s3bubble.com/
 License: GPL2
@@ -36,7 +36,7 @@ if (!class_exists("s3bubble_video_adverts")) {
 		 */ 
         public  $s3bubble_video_adverts_accesskey  = '';
 		public  $s3bubble_video_adverts_secretkey  = '';
-		public  $version                           = 3;
+		public  $version                           = 4;
 		private $endpoint                          = 'https://api.s3bubble.com/';
 		
 		/*
@@ -115,9 +115,9 @@ if (!class_exists("s3bubble_video_adverts")) {
 		* @none
 		*/ 
 		function s3bubble_video_adverts_css_admin(){
-			wp_register_style( 's3bubble.video.advert.admin', plugins_url('assets/css/s3bubble.video.advert.admin.css', __FILE__) );
+			wp_register_style( 's3bubble.video.advert.admin', plugins_url('assets/css/s3bubble.video.advert.admin.css', __FILE__), array(), $this->version );
 			wp_enqueue_style('s3bubble.video.advert.admin');
-			wp_register_style( 's3bubble.video.advert.plugin', plugins_url('assets/css/s3bubble.video.advert.plugin.css', __FILE__) );
+			wp_register_style( 's3bubble.video.advert.plugin', plugins_url('assets/css/s3bubble.video.advert.plugin.css', __FILE__), array(), $this->version );
 			wp_enqueue_style('s3bubble.video.advert.plugin');
 		}
 		
@@ -172,7 +172,7 @@ if (!class_exists("s3bubble_video_adverts")) {
 		    <script type="text/javascript">
 		        jQuery( document ).ready(function( $ ) {
 		        	$('#TB_ajaxContent').css({
-                    	'width' : 'none',
+                    	'width' : 'auto',
                     	'height' : '450px'
                     });
 			        var sendData = {
@@ -329,42 +329,106 @@ if (!class_exists("s3bubble_video_adverts")) {
 		<div class="wrap">
 			<div id="icon-options-general" class="icon32"></div>
 			<h2>S3Bubble Amazon S3 Video & Custom Advertising</h2>
-			<h3><span>Manage all your media audio and video in one place. Listen watch and upload with your mobile. <a href="https://itunes.apple.com/us/app/s3bubble/id720256052?ls=1&mt=8" target="_blank">iPhone App</a> ~ <a href="https://play.google.com/store/apps/details?id=com.s3bubbleAndroid&hl=en_GB" target="_blank">Android App</a></span></h3>
+			<div id="message" class="updated fade"><p>Please sign up for a S3Bubble account at <a href="https://s3bubble.com" target="_blank">https://s3bubble.com</a></p></div>
 			<div class="metabox-holder has-right-sidebar">
-				<div class="inner-sidebar" style="width:50%">
+				<div class="inner-sidebar" style="width:40%">
 					
 					<div class="postbox">
-						<h3><span>*BRAND NEW WYSIWYG EDITOR BUTTONS</span></h3>
+						<h3 class="hndle">BRAND NEW WYSIWYG EDITOR BUTTONS</h3>
 						<div class="inside">
 							<img style="width: 100%;" src="https://isdcloud.s3.amazonaws.com/wp_editor.png" />
 						</div> 
 					</div>
 					
 					<div class="postbox">
-						<h3><span>PLEASE WATCH TUTORIAL VIDEO</span></h3>
+						<h3 class="hndle">S3Bubble Plugins</h3>
 						<div class="inside">
-							<iframe width="100%" height="315" src="//www.youtube.com/embed/z3DZ1fpXR0I" frameborder="0" allowfullscreen></iframe>
+							<ul class="s3bubble-adverts">
+								<li>
+										<img src="https://s3bubble.com/wp-content/uploads/2014/07/s3streamin.png" alt="S3Bubble wordpress plugin" /> 
+										<h3>
+											Video Popup WP Plugin
+										</h3>
+										<p>Add a popup promotional or advertising video.</p>
+										<a class="button button-s3bubble" href="https://wordpress.org/plugins/s3bubble-amazon-s3-video-popup/" target="_blank">DOWNLOAD</a>
+										<a class="button button-s3bubble" href="https://www.youtube.com/watch?v=GcTLSOvddaM" target="_blank">VIDEO</a>
+								</li>
+								<li>
+			
+										<img src="https://s3bubble.com/wp-content/uploads/2014/07/s3streamin.png" alt="S3Bubble wordpress plugin" /> 
+										<h3>
+											Video Adverts WP Plugin 
+											
+										</h3>
+										<p>Add adverts before your videos & skip time.</p>
+										<a class="button button-s3bubble" href="https://wordpress.org/plugins/s3bubble-amazon-s3-html-5-video-with-adverts/" target="_blank">DOWNLOAD</a>
+										<a class="button button-s3bubble" href="https://www.youtube.com/watch?v=z3DZ1fpXR0I" target="_blank">VIDEO</a>
+								</li>
+								<li>
+			
+										<img src="https://s3bubble.com/wp-content/uploads/2014/07/s3streamin.png" alt="S3Bubble wordpress plugin" /> 
+										<h3>
+											Wordpress Media Plugin
+										</h3>
+										<p>Stream media directly onto your wordpress blogs.</p>
+										<a class="button button-s3bubble" href="https://wordpress.org/plugins/s3bubble-amazon-s3-audio-streaming/" target="_blank">DOWNLOAD</a>
+										<a class="button button-s3bubble" href="https://www.youtube.com/watch?v=EyBTpJ9GJCw" target="_blank">VIDEO</a>
+								</li>
+								<li>
+										<img src="https://s3bubble.com/wp-content/uploads/2014/07/s3backup.png" alt="S3Bubble wordpress backup plugin" />
+										<h3>
+											Free WP Backup Plugin
+										</h3>
+										<p>Store your data securely and ensure you website is safe.</p>
+										<a class="button button-s3bubble" href="http://wordpress.org/plugins/s3bubble-amazon-s3-backup/" target="_blank">DOWNLOAD</a>
+										<a class="button button-s3bubble" href="https://www.youtube.com/watch?v=niqugoI8gis" target="_blank">VIDEO</a>
+								</li>
+							</ul>        
 						</div> 
 					</div>
-
-		            <div class="postbox"> 
-						<h3><span>Video Shortcode Example - These are auto generated within your s3bubble admin</span></h3>
+					<div class="postbox">
+						<h3 class="hndle">S3Bubble Mobile Apps</h3>
 						<div class="inside">
-							<pre class="s3bubble-pre">[s3bubbleVideoAdvert bucket="enter-your-bucket" key="enter-your-object"]</pre>
-						</div>
+							<ul class="s3bubble-adverts">
+								<li>
+										<img src="https://s3bubble.com/wp-content/themes/s3audible/img/plugins/iphoneapp.jpg" alt="S3Bubble iPhone" /> 
+										<h3>
+											iPhone Mobile App
+										</h3>
+										<p>Record Manage Watch Download Share.</p>
+										<a class="button button-s3bubble" href="https://itunes.apple.com/us/app/s3bubble/id720256052?ls=1&mt=8" target="_blank">GET THE APP</a>
+								</li>
+								<li>
+			
+										<img src="https://s3bubble.com/wp-content/themes/s3audible/img/plugins/androidapp.png" alt="S3Bubble Android" /> 
+										<h3>
+											Android Mobile App
+											
+										</h3>
+										<p>Record Manage Watch Download Share.</p>
+										<a class="button button-s3bubble" href="https://play.google.com/store/apps/details?id=com.s3bubbleAndroid" target="_blank">GET THE APP</a>
+								</li>
+								<li>
+			
+										<img src="https://s3bubble.com/wp-content/themes/s3audible/img/plugins/flix.png" alt="S3Bubble Flix" /> 
+										<h3>
+											S3Bubble Flix Android
+										</h3>
+										<p>Create your own personal video network.</p>
+										<a class="button button-s3bubble" href="https://play.google.com/store/apps/details?id=com.s3bubbleflixandroid" target="_blank">GET THE APP</a>
+								</li>
+							</ul>        
+						</div> 
 					</div>
 				</div>
 				<div id="post-body">
-					<div id="post-body-content" style="margin-right: 51%;">
+					<div id="post-body-content" style="margin-right: 41%;">
 						<div class="postbox">
-							<h3><span>Please sign up for an account at <a href="https://s3bubble.com/auth/?action=register&utm_source=wordpress&utm_medium=link&utm_campaign=pluginpage" target="_blank">https://s3bubble.com</a> you will need to use the username and email you signed up with.</span></h3>
+							<h3 class="hndle">Fill in details below if stuck please <a class="button button-s3bubble" style="float: right;margin: -5px -10px;" href="https://www.youtube.com/watch?v=z3DZ1fpXR0I" target="_blank">Watch Video</a></h3>
 							<div class="inside">
-								<form action="" method="post" id="isd-config" style="overflow: hidden;">
+								<form action="" method="post" class="s3bubble-video-popup-form" style="overflow: hidden;">
 								    <table class="form-table">
 								      <?php if (function_exists('wp_nonce_field')) { wp_nonce_field('isd-updatesettings'); } ?>
-								       <tr>
-								        <h3>Global S3Bubble Settings</h3>
-								      </tr> 
 								       <tr>
 								        <th scope="row" valign="top"><label for="s3bubble_video_adverts_accesskey">App Access Key:</label></th>
 								        <td><input type="text" name="s3bubble_video_adverts_accesskey" id="s3bubble_video_adverts_accesskey" class="regular-text" value="<?php echo $s3bubble_video_adverts_accesskey; ?>"/>
@@ -381,9 +445,8 @@ if (!class_exists("s3bubble_video_adverts")) {
 								      </tr> 
 								    </table>
 								    <br/>
-								    <span class="description">There is NO branding or limitations on the S3Bubble Wordpress Plugins.</p>
 								    <span class="submit" style="border: 0;">
-								    <input type="submit" name="submit" class="button button-primary button-hero" value="Save Settings" />
+								    <input type="submit" name="submit" class="button button-s3bubble button-hero" value="Save Settings" />
 								    </span>
 								  </form>
 							</div><!-- .inside -->
