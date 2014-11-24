@@ -153,8 +153,8 @@ if (!class_exists("s3bubble_video_adverts")) {
 	            wp_enqueue_script('jquery');
 	            wp_register_script( 'jquery-migrate', '//code.jquery.com/jquery-migrate-1.2.1.min.js', false, null);
 	            wp_enqueue_script('jquery-migrate');
-				wp_register_script( 's3player.adverts.jplayer.min', plugins_url('assets/js/s3player.adverts.jplayer.min.js',__FILE__ ), array(), $this->version );
-	            wp_enqueue_script('s3player.adverts.jplayer.min');
+				wp_register_script( 'jquery.s3player.min', plugins_url('assets/js/s3player.adverts.jplayer.min.js',__FILE__ ), array(), $this->version );
+	            wp_enqueue_script('jquery.s3player.min');
 				wp_register_script( 's3player.adverts.s3bubble.min', plugins_url('assets/js/s3player.adverts.s3bubble.min.js',__FILE__ ), array(), $this->version );
 	            wp_enqueue_script('s3player.adverts.s3bubble.min');
             } 
@@ -179,28 +179,40 @@ if (!class_exists("s3bubble_video_adverts")) {
 						AccessKey: '<?php echo $s3bubble_access_key; ?>'
 					};
 					$.post("<?php echo $this->endpoint; ?>s3media/buckets/", sendData, function(response) {
+						var isSingle = response.Single;
 						var html = '<select class="form-control input-lg" tabindex="1" name="s3bucket" id="s3bucket"><option value="">Choose bucket</option>';
 					    $.each(response.Buckets, function (i, item) {
 					    	var bucket = item.Name;
-					    	html += '<option value="' + bucket + '">' + bucket + '</option>';
+					    	if(isSingle === true){
+					    		html += '<option value="s3bubble.users">' + bucket + '</option>';
+					    	}else{
+					    		html += '<option value="' + bucket + '">' + bucket + '</option>';	
+					    	}
 						});
 						html += '</select>';
 						$('#s3bubble-buckets-shortcode').html(html);
 						$( "#s3bucket" ).change(function() {
 						   $('#s3bubble-folders-shortcode').html('<img src="<?php echo plugins_url('/assets/js/ajax-loader.gif',__FILE__); ?>"/> loading videos files');
 						   var bucket = $(this).val();
-							var data = {
+						   if(isSingle === true){
+						   		bucket = $("#s3bucket option:selected").text();
+						   }
+						   var data = {
 								AccessKey: '<?php echo $s3bubble_access_key; ?>',
 								Bucket: bucket
-							};
-							$.post("<?php echo $this->endpoint; ?>s3media/video_files/", data, function(response) {
+						   };
+						   $.post("<?php echo $this->endpoint; ?>s3media/video_files/", data, function(response) {
 								var html = '<select class="form-control input-lg" tabindex="1" name="s3folder" id="s3folder"><option value="">Choose video</option>';
 							    $.each(response, function (i, item) {
-							    	var folder = item.Key;
-							    	var ext    = folder.split('.').pop();
-							    	if(ext == 'mp4' || ext === 'm4v'){
-							    		html += '<option value="' + folder + '">' + folder + '</option>';
-							    	}
+							    	if(isSingle === true){
+										html += '<option value="' + item + '">' + item + '</option>';
+									}else{
+								    	var folder = item.Key;
+								    	var ext    = folder.split('.').pop();
+								    	if(ext == 'mp4' || ext === 'm4v'){
+								    		html += '<option value="' + folder + '">' + folder + '</option>';
+								    	}
+								    }
 								});
 								html += '</select>';
 								$('#s3bubble-folders-shortcode').html(html);
