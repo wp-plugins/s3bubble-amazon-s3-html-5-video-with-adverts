@@ -114,6 +114,16 @@ Once you’ve installed the plug-in, the S3 Bubble Tutorial will guide you along
 
 == Changelog ==
 
+= 0.5 =
+
+Brand new video analytics added
+
+New video video player
+
+Video advertisements added
+
+Allow advert skip time
+
 = 0.1 =
 
 Issue with Android phone
