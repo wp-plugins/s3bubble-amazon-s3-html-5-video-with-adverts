@@ -1,4 +1,4 @@
-=== S3Bubble Amazon S3 HTML 5 Video With Adverts ===
+=== S3Bubble Cloud Video With Adverts ===
 Contributors: Samuel East
 Donate link: https://s3bubble.com
 Tags: S3Bubble, S3 Bubble, Amazon, AmazonS3, Amazon S3, HTML 5 Player, HTML5 Player, HTML5Player, Video, VideoPlayer, Video-Player, Video player, Media, MediaPlayer
