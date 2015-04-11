@@ -1,0 +1,14 @@
+.s3bubble-video-player {
+	overflow: hidden;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+	-moz-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+	-webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+	-o-box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+.ult_vp_overlay {
+	top: 0px;
+	left: 0px;
+}
+#ult_vp_overlayPoster {
+	width: 100%;
+}
