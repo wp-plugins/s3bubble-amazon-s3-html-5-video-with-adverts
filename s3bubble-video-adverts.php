@@ -3,7 +3,7 @@
 Plugin Name: S3Bubble Cloud Video With Adverts & Analytics
 Plugin URI: https://www.s3bubble.com/
 Description: S3Bubble offers simple, secure media streaming from Amazon S3 to WordPress and adding your very own adverts with analytics. In just 4 simple steps. 
-Version: 0.5
+Version: 0.6
 Author: S3Bubble
 Author URI: https://s3bubble.com/
 License: GPL2
@@ -36,9 +36,6 @@ if (!class_exists("s3bubble_video_adverts")) {
 		 */ 
         public  $s3bubble_video_adverts_accesskey   = '';
 		public  $s3bubble_video_adverts_secretkey   = '';
-		public  $s3bubble_video_adverts_bar_colours = '#dd0000';
-		public  $s3bubble_video_adverts_controls_bg = '#010101';
-		public  $s3bubble_video_adverts_icons       = '#FFFFFF';
 		public  $version                            = 6;
 		private $endpoint                           = 'https://api.s3bubble.com/v1/';
 		
@@ -56,9 +53,6 @@ if (!class_exists("s3bubble_video_adverts")) {
 			 */ 
 			add_option("s3bubble_video_adverts_accesskey", $this->s3bubble_video_adverts_accesskey);
 			add_option("s3bubble_video_adverts_secretkey", $this->s3bubble_video_adverts_secretkey);
-			add_option("s3bubble_video_adverts_bar_colours", $this->s3bubble_video_adverts_bar_colours);
-			add_option("s3bubble_video_adverts_controls_bg", $this->s3bubble_video_adverts_controls_bg);
-			add_option("s3bubble_video_adverts_icons", $this->s3bubble_video_adverts_icons);
 			
 
 			/*
@@ -332,24 +326,15 @@ if (!class_exists("s3bubble_video_adverts")) {
 				// Get our new option values
 				$s3bubble_video_adverts_accesskey	= $_POST['s3bubble_video_adverts_accesskey'];
 				$s3bubble_video_adverts_secretkey	= $_POST['s3bubble_video_adverts_secretkey'];
-				$s3bubble_video_adverts_bar_colours	= $_POST['s3bubble_video_adverts_bar_colours'];
-				$s3bubble_video_adverts_controls_bg	= $_POST['s3bubble_video_adverts_controls_bg'];
-				$s3bubble_video_adverts_icons	    = $_POST['s3bubble_video_adverts_icons'];
 
 			    // Update the DB with the new option values
 				update_option("s3bubble_video_adverts_accesskey", $s3bubble_video_adverts_accesskey);
 				update_option("s3bubble_video_adverts_secretkey", $s3bubble_video_adverts_secretkey);
-				update_option("s3bubble_video_adverts_bar_colours", $s3bubble_video_adverts_bar_colours);
-				update_option("s3bubble_video_adverts_controls_bg", $s3bubble_video_adverts_controls_bg);
-				update_option("s3bubble_video_adverts_icons", $s3bubble_video_adverts_icons);
 
 			}
 			
 			$s3bubble_video_adverts_accesskey	= get_option("s3bubble_video_adverts_accesskey");
 			$s3bubble_video_adverts_secretkey	= get_option("s3bubble_video_adverts_secretkey");
-			$s3bubble_video_adverts_bar_colours	= get_option("s3bubble_video_adverts_bar_colours");
-			$s3bubble_video_adverts_controls_bg	= get_option("s3bubble_video_adverts_controls_bg");
-			$s3bubble_video_adverts_icons	    = get_option("s3bubble_video_adverts_icons");
 
 		?>
 		<div class="wrap">
@@ -439,27 +424,6 @@ if (!class_exists("s3bubble_video_adverts")) {
 								        	<span class="description">App Secret Key can be found <a href="https://s3bubble.com/admin/#/apps" target="_blank">here</a></span>
 								        </td>
 								      </tr> 
-								      <!--<tr>
-								        <th scope="row" valign="top"><label for="s3bubble_video_adverts_bar_colours">Player Bar Colours:</label></th>
-								        <td> <input type="text" name="s3bubble_video_adverts_bar_colours" id="s3bubble_video_adverts_bar_colours" value="<?php echo $s3bubble_video_adverts_bar_colours; ?>" class="cpa-color-picker" >
-								        	<br />
-								        	<span class="description">Change the progress bar and volume bar colour</span>
-								        </td>
-								      </tr>
-								      <tr>
-								        <th scope="row" valign="top"><label for="s3bubble_video_adverts_controls_bg">Player Controls Colour:</label></th>
-								        <td> <input type="text" name="s3bubble_video_adverts_controls_bg" id="s3bubble_video_adverts_controls_bg" value="<?php echo $s3bubble_video_adverts_controls_bg; ?>" class="cpa-color-picker" >
-								        	<br />
-								        	<span class="description">Change the controls background colour</span>
-								        </td>
-								      </tr> 
-								      <tr>
-								        <th scope="row" valign="top"><label for="s3bubble_video_adverts_icons">Player Icon Colours:</label></th>
-								        <td> <input type="text" name="s3bubble_video_adverts_icons" id="s3bubble_video_adverts_icons" value="<?php echo $s3bubble_video_adverts_icons; ?>" class="cpa-color-picker" >
-								        	<br />
-								        	<span class="description">Change the player icons colours</span>
-								        </td>
-								      </tr>-->  
 								    </table>
 								    <br/>
 								    <span class="submit" style="border: 0;">
