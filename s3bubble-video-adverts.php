@@ -36,6 +36,10 @@ if (!class_exists("s3bubble_video_adverts")) {
 		 */ 
         public  $s3bubble_video_adverts_accesskey   = '';
 		public  $s3bubble_video_adverts_secretkey   = '';
+		public  $s3bubble_video_adverts_bar_colours = '#adadad';
+		public  $s3bubble_video_adverts_bar_seeks   = '#dd0000';
+		public  $s3bubble_video_adverts_controls_bg = '#010101';
+		public  $s3bubble_video_adverts_icons       = '#FFFFFF';
 		public  $version                            = 6;
 		private $endpoint                           = 'https://api.s3bubble.com/v1/';
 		
@@ -53,6 +57,10 @@ if (!class_exists("s3bubble_video_adverts")) {
 			 */ 
 			add_option("s3bubble_video_adverts_accesskey", $this->s3bubble_video_adverts_accesskey);
 			add_option("s3bubble_video_adverts_secretkey", $this->s3bubble_video_adverts_secretkey);
+			add_option("s3bubble_video_adverts_bar_colours", $this->s3bubble_video_adverts_bar_colours);
+			add_option("s3bubble_video_adverts_bar_seeks", $this->s3bubble_video_adverts_bar_seeks);
+			add_option("s3bubble_video_adverts_controls_bg", $this->s3bubble_video_adverts_controls_bg);
+			add_option("s3bubble_video_adverts_icons", $this->s3bubble_video_adverts_icons);
 			
 
 			/*
@@ -92,6 +100,50 @@ if (!class_exists("s3bubble_video_adverts")) {
 			add_action( 'init', array( $this, 's3bubble_video_adverts_wysiwyg_buttons' ) );
 			add_action( 'wp_ajax_s3bubble_video_adverts_wysiwyg_ajax', array( $this, 's3bubble_video_adverts_wysiwyg_ajax' ) );
 
+			/*
+			 * Internal Ajax
+			 */
+			add_action( 'wp_ajax_s3bubble_video_adverts_internal_ajax', array( $this, 's3bubble_video_adverts_internal_ajax' ) );
+			add_action('wp_ajax_nopriv_s3bubble_video_adverts_internal_ajax', array( $this, 's3bubble_video_adverts_internal_ajax' ) ); 
+
+			/*
+			 * Admin dismiss message
+			 */
+			add_action('admin_notices', array( $this, 's3bubble_adverts_admin_notice' ) );
+			add_action('admin_init', array( $this, 's3bubble_adverts_nag_ignore' ) );
+
+		}
+
+		/*
+		* Sets up a admin alert notice
+		* @author sameast
+		* @none
+		*/ 
+		function s3bubble_adverts_admin_notice() {
+			global $current_user ;
+	        $user_id = $current_user->ID;
+	        $params = array_merge($_GET, array("s3bubble_adverts_nag_ignore" => 0));
+			$new_query_string = http_build_query($params); 
+		    /* Check that the user hasn't already clicked to ignore the message */
+			if ( ! get_user_meta($user_id, 's3bubble_adverts_nag_ignore') ) {
+		        echo '<div class="updated"><p>'; 
+		        echo 'Thankyou for upgrading your S3Bubble media streaming plugin. Any issues please contact us at <a href="mailto:support@s3bubble.com">support@s3bubble.com</a> if you are stuck you can always roll back within the S3Bubble WP admin download and re-install the old plugin. Want to see the great new features please watch this video <a href="https://s3bubble.com/video_tutorials/s3bubble-plugin-upgrade/" target="_blank">Watch Video</a>. | <a href="' . $_SERVER['PHP_SELF'] . "?" . $new_query_string . '" class="pull-right">Hide Notice</a>';
+		        echo "</p></div>";
+			}
+		}
+
+		/*
+		* Allows users to ignore the message
+		* @author sameast
+		* @none
+		*/ 
+		function s3bubble_adverts_nag_ignore() {
+			global $current_user;
+		        $user_id = $current_user->ID;
+		        /* If user clicks to ignore the notice, add that to their user meta */
+		        if ( isset($_GET['s3bubble_adverts_nag_ignore']) && '0' == $_GET['s3bubble_adverts_nag_ignore'] ) {
+		             add_user_meta($user_id, 's3bubble_adverts_nag_ignore', 'true', true);
+			}
 		}
         
 		/*
@@ -111,16 +163,18 @@ if (!class_exists("s3bubble_video_adverts")) {
 		function s3bubble_video_adverts_admin_scripts(){
 			
 			// Css
-			wp_register_style( 's3bubble.video.advert.admin', plugins_url('assets/css/s3bubble.video.advert.admin.css', __FILE__), array(), $this->version );
-			wp_register_style( 's3bubble.video.advert.plugin', plugins_url('assets/css/s3bubble.video.advert.plugin.css', __FILE__), array(), $this->version );
+			wp_register_style( 's3bubble.video.all.admin', plugins_url('assets/css/s3bubble.video.all.admin.min.css', __FILE__), array(), $this->version );
+			wp_register_style( 's3bubble.video.all.plugin', plugins_url('assets/css/s3bubble.video.all.plugin.min.css', __FILE__), array(), $this->version );
 			
 			
-			wp_enqueue_style('s3bubble.video.advert.admin');
-			wp_enqueue_style('s3bubble.video.advert.plugin');
-			wp_enqueue_style( 'wp-color-picker' );
+			wp_enqueue_style('s3bubble.video.all.admin');
+			wp_enqueue_style('s3bubble.video.all.plugin');
 			
 			// Javascript
-			wp_enqueue_script( 's3bubble-admin-js', plugins_url( 'assets/js/s3bubble.admin.js', __FILE__ ), array( 'wp-color-picker' ), false, true ); 
+			wp_enqueue_script( 's3bubble.video.adverts.plugin', plugins_url( 'assets/js/s3bubble.video.adverts.plugin.min.js', __FILE__ ), array( ), false, true ); 
+			wp_enqueue_style( 'wp-color-picker' );
+			// Javascript
+			wp_enqueue_script( 's3bubble.video.all.colour', plugins_url( 'assets/js/s3bubble.video.all.colour.min.js', __FILE__ ), array( 'wp-color-picker' ), false, true ); 
 			
 		} 
 		
@@ -130,9 +184,25 @@ if (!class_exists("s3bubble_video_adverts")) {
 		* @params none
         */ 
 		function s3bubble_video_adverts_css(){
+
+			$progress	= get_option("s3bubble_video_adverts_bar_colours");
+			$background	= get_option("s3bubble_video_adverts_controls_bg");
+			$seek	    = get_option("s3bubble_video_adverts_bar_seeks");
+			$icons	    = get_option("s3bubble_video_adverts_icons");
 			
-			wp_register_style( 's3bubble.video.ultimate.plugin', plugins_url('assets/plugins/ultimate/start/content/global.css', __FILE__), array(), $this->version );
-			wp_enqueue_style('s3bubble.video.ultimate.admin');
+			wp_register_style( 'font-s3bubble.min', plugins_url('assets/css/font-awesome.min.css', __FILE__), array(), $this->version );
+			wp_register_style( 's3bubble.video.all.main', plugins_url('assets/css/s3bubble.video.all.main.min.css', __FILE__), array(), $this->version );
+			
+			wp_enqueue_style('font-s3bubble.min');
+			wp_enqueue_style('s3bubble.video.all.main');
+			
+			echo '<style type="text/css">
+                    .s3bubble-media-main-progress, .s3bubble-media-main-volume-bar {background-color: '.stripcslashes($progress).' !important;}
+					.s3bubble-media-main-play-bar, .s3bubble-media-main-volume-bar-value {background-color: '.stripcslashes($seek).' !important;}
+					.s3bubble-media-main-interface, .s3bubble-media-main-video-play {background-color: '.stripcslashes($background).' !important;color: '.stripcslashes($icons).' !important;}
+					.s3bubble-media-main-video-loading {color: '.stripcslashes($icons).' !important;}
+					.s3bubble-media-main-interface  > * a, .s3bubble-media-main-current-time, .s3bubble-media-main-duration, .time-sep {color: '.stripcslashes($icons).' !important;}
+			</style>';
 			
 		}
 		
@@ -142,23 +212,65 @@ if (!class_exists("s3bubble_video_adverts")) {
 		* @none
 		*/ 
 		function s3bubble_video_adverts_javascript(){
-           if (!is_admin()) {
 
-				wp_register_script( 's3bubble.ultimate.video', plugins_url('assets/plugins/ultimate/java/FWDUVPlayer.js',__FILE__ ), array('jquery'), $this->version );
-				wp_localize_script('s3bubble.ultimate.video', 's3bubble_advert_object', array(
-					's3appid' => get_option("s3bubble_video_adverts_accesskey"),
-					'serveraddress' => $_SERVER['REMOTE_ADDR']
-				));
-				wp_register_script( 'playlist', plugins_url('assets/plugins/video/js/Playlist.js',__FILE__ ), array('jquery'), $this->version );
-				wp_register_script( 's3bubble.analytics.min', plugins_url('assets/js/s3analytics.js',__FILE__ ), array('jquery'),  $this->version, true );
+			wp_register_script( 's3player.all.s3bubble', plugins_url('assets/js/s3player.all.main.player.min.js',__FILE__ ), array('jquery'), $this->version, true  );
+			wp_localize_script('s3player.all.s3bubble', 's3bubble_advert_object', array(
+				's3appid' => get_option("s3bubble_video_adverts_accesskey"),
+				'serveraddress' => $_SERVER['REMOTE_ADDR']
+			));
+			wp_register_script( 's3bubble.mobile.browser.check', plugins_url('assets/js/mobile.browser.check.min.js',__FILE__ ), array('jquery'),  $this->version, true );
+			wp_register_script( 's3bubble.analytics.min', plugins_url('assets/js/s3analytics.min.js',__FILE__ ), array('jquery'),  $this->version, true );
+			
+			wp_enqueue_script('jquery');
+			wp_enqueue_script('jquery-migrate');
+			wp_enqueue_script('s3player.all.s3bubble');
+			wp_enqueue_script('s3bubble.mobile.browser.check');
+			wp_enqueue_script('s3bubble.analytics.min');
 
-				
-				wp_enqueue_script('jquery');
-				wp_enqueue_script('jquery-migrate');
-				wp_enqueue_script('s3bubble.ultimate.video');
-				wp_enqueue_script('s3bubble.analytics.min');
-				
-            } 
+		}
+
+		/*
+		* Video playlist internal ajax call
+		* @author sameast
+		* @none
+		*/ 
+		function s3bubble_video_adverts_internal_ajax(){
+			
+			$s3bubble_video_adverts_accesskey	= get_option("s3bubble_video_adverts_accesskey");
+			$s3bubble_video_adverts_secretkey	= get_option("s3bubble_video_adverts_secretkey");
+
+			//set POST variables
+			$url = $this->endpoint . 'main_plugin/single_video_object';
+			$fields = array(
+				'AccessKey' => $s3bubble_video_adverts_accesskey,
+			    'SecretKey' => $s3bubble_video_adverts_secretkey,
+			    'Timezone' => 'America/New_York',
+			    'Bucket' => $_POST['Bucket'],
+			    'Key' => $_POST['Key'],
+			    'Cloudfront' => $_POST['Cloudfront']
+			);
+
+			if(!function_exists('curl_init')){
+    			echo json_encode(array("error" => "<i>Your hosting does not have PHP curl installed. Please install php curl S3Bubble requires PHP curl to work!</i>"));
+    			exit();
+    		}
+			
+			//open connection
+			$ch = curl_init();
+			//set the url, number of POST vars, POST data
+			curl_setopt($ch,CURLOPT_URL, $url);
+			curl_setopt($ch,CURLOPT_POST, true);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch,CURLOPT_POSTFIELDS, $fields);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+			//execute post
+		    $result = curl_exec($ch);
+			echo $result;
+			curl_close($ch);
+
+			die();	
+			
 		}
 
         /*
@@ -176,15 +288,15 @@ if (!class_exists("s3bubble_video_adverts")) {
                     	'width' : 'auto',
                     	'height' : '450px'
                     });
-                    $(".s3bubble-video-form-alerts").html("<p>Grabbing folders please wait...</p>");
 			        var sendData = {
 						AccessKey: '<?php echo $s3bubble_access_key; ?>'
 					};
-					$.post("<?php echo $this->endpoint; ?>wp_adverts/buckets/", sendData, function(response) {
+					$.post("<?php echo $this->endpoint; ?>main_plugin/live_buckets/", sendData, function(response) {
+						console.log(response);
 						if(response.error){
-							$(".s3bubble-video-form-alerts").html("<p>Oh Snap! " + response.message + ". If you do not understand this error please contact support@s3bubble.com</p>");
+							$(".s3bubble-video-main-form-alerts").html("<p>Oh Snap! " + response.message + ". If you do not understand this error please contact support@s3bubble.com</p>");
 						}else{
-							$(".s3bubble-video-form-alerts").html("<p>Awesome! " + response.message + ".</p>");
+							$(".s3bubble-video-main-form-alerts").html("<p>Awesome! " + response.message + ".</p>");
 							var isSingle = response.data.Single;
 							var html = '<select class="form-control input-lg" tabindex="1" name="s3bucket" id="s3bucket"><option value="">Choose bucket</option>';
 						    $.each(response.data.Buckets, function (i, item) {
@@ -204,11 +316,11 @@ if (!class_exists("s3bubble_video_adverts")) {
 						   if(isSingle === true){
 						   		bucket = $("#s3bucket option:selected").text();
 						   }
-						   var data = {
+							var data = {
 								AccessKey: '<?php echo $s3bubble_access_key; ?>',
 								Bucket: bucket
-						   };
-						   $.post("<?php echo $this->endpoint; ?>wp_adverts/video_files/", data, function(response) {
+							};
+							$.post("<?php echo $this->endpoint; ?>main_plugin/video_files/", data, function(response) {
 								var html = '<select class="form-control input-lg" tabindex="1" name="s3folder" id="s3folder"><option value="">Choose video</option>';
 							    $.each(response, function (i, item) {
 							    	if(isSingle === true){
@@ -227,51 +339,40 @@ if (!class_exists("s3bubble_video_adverts")) {
 						});				
 					},'json');
 			        $('#s3bubble-mce-submit').click(function(){
-			        	var bucket      = $('#s3bucket').val();
-			        	var folder      = $('#s3folder').val();
-			        	var skiptime    = $('#s3bubble-video-skip-time').val();
-			        	var aspectRatio = $('#s3bubble-video-aspect-ratio').val();
-			        	var advertLink  = $('#s3bubble-video-advert-link').val();
-			        	var autoplay    = $('#s3autoplay').val();
-						var shortcode = '[s3bubbleVideoAdvert bucket="' + bucket + '" key="' + folder + '" autoplay="' + autoplay + '" skip="' + skiptime + '" aspect="' + aspectRatio + '" advert="' + advertLink + '"/]';
+			        	var bucket     = $('#s3bucket').val();
+			        	var folder     = $('#s3folder').val();
+			        	var link       = $('#s3bubble-advert-link').val();
+			        	if($("#s3autoplay").is(':checked')){
+						    var autoplay = true;
+						}else{
+						    var autoplay = false;
+						}
+						var aspect = '16:9';
+						if($('#s3aspect').val() != ''){
+						    aspect = $('#s3aspect').val();
+						}
+						var shortcode = '[s3bubbleVideoAdvert bucket="' + bucket + '" track="' + folder + '" aspect="' + aspect + '" autoplay="' + autoplay + '" link="' + link + '"/]';
 	                    tinyMCE.activeEditor.execCommand('mceInsertContent', 0, shortcode);
 	                    tb_remove();
 			        });
 		        })
 		    </script>
 		    <form class="s3bubble-form-general">
-		    	<div class="s3bubble-video-form-alerts"></div>
+                <div class="s3bubble-video-main-form-alerts"></div>
 		    	<p>
 			    	<span class="s3bubble-pull-left" id="s3bubble-buckets-shortcode">loading buckets...</span>
 					<span class="s3bubble-pull-right" id="s3bubble-folders-shortcode"></span>
 				</p>
 				<p>
-					<span class="s3bubble-pull-left" style="width: 48.5%;">
-						<label for="fname">Set Advert Skip Time:</label>
-						<input type="text" class="s3bubble-form-input" name="s3bubble-video-skip-time" id="s3bubble-video-skip-time">
+					<span class="s3bubble-pull-right">
+				    	<label for="fname">Advert Link</label><input type="text" class="s3bubble-form-input" name="s3bubble-advert-link" id="s3bubble-advert-link">
 				    </span>
-				    <span class="s3bubble-pull-right" style="width: 49%;">
-				    	<label for="fname">Set Video Aspect Ratio:</label>
-				    	<select name="s3bubble-video-aspect-ratio" id="s3bubble-video-aspect-ratio">
-						  <option value="16:9" selected>16:9</option>
-						  <option value="4:3">4:3</option>
-						  <option value="3:2" >3:2</option>
-						  <option value="21:9">21:9</option>
-						</select>
+					<span class="s3bubble-pull-left">
+				    	<label for="fname">Aspect Ratio: (Example: 16:9 / 4:3 Default: 16:9)</label><input type="text" class="s3bubble-form-input" name="aspect" id="s3aspect">
 				    </span>
-				    <span class="s3bubble-pull-left" style="width:  48.5%;">
-						<label for="fname">Advert Link:</label>
-						<input type="text" class="s3bubble-form-input" name="s3bubble-video-advert-link" id="s3bubble-video-advert-link">
-				    </span>
-				     <span class="s3bubble-pull-right" style="width: 49%;">
-				    	<label for="fname">Set Video Autoplay:</label>
-				    	<select name="autoplay" id="s3autoplay">
-						  <option value="no" selected>No</option>
-						  <option value="yes">Yes</option>
-						</select>
-				    </span>
-				</p>
-				<input type="hidden" class="s3bubble-form-input" name="cloudfront" id="s3cloudfront">
+				</p> 
+                <blockquote class="bs-callout-s3bubble"><strong>Extra options:</strong> please just select any extra options from the list below, and S3Bubble will automatically add it to the shortcode.</blockquote>
+				<p><input type="checkbox" name="autoplay" id="s3autoplay">Autoplay <i>(Start Video On Page Load)</i><br />
 				<p>
 					<a href="#"  id="s3bubble-mce-submit" class="s3bubble-pull-right button media-button button-primary button-large media-button-gallery">Insert Shortcode</a>
 				</p>
@@ -326,15 +427,27 @@ if (!class_exists("s3bubble_video_adverts")) {
 				// Get our new option values
 				$s3bubble_video_adverts_accesskey	= $_POST['s3bubble_video_adverts_accesskey'];
 				$s3bubble_video_adverts_secretkey	= $_POST['s3bubble_video_adverts_secretkey'];
+				$s3bubble_video_adverts_bar_colours	= $_POST['s3bubble_video_adverts_bar_colours'];
+				$s3bubble_video_adverts_bar_seeks	= $_POST['s3bubble_video_adverts_bar_seeks'];
+				$s3bubble_video_adverts_controls_bg	= $_POST['s3bubble_video_adverts_controls_bg'];
+				$s3bubble_video_adverts_icons	    = $_POST['s3bubble_video_adverts_icons'];
 
 			    // Update the DB with the new option values
 				update_option("s3bubble_video_adverts_accesskey", $s3bubble_video_adverts_accesskey);
 				update_option("s3bubble_video_adverts_secretkey", $s3bubble_video_adverts_secretkey);
+				update_option("s3bubble_video_adverts_bar_colours", $s3bubble_video_adverts_bar_colours);
+				update_option("s3bubble_video_adverts_bar_seeks", $s3bubble_video_adverts_bar_seeks);
+				update_option("s3bubble_video_adverts_controls_bg", $s3bubble_video_adverts_controls_bg);
+				update_option("s3bubble_video_adverts_icons", $s3bubble_video_adverts_icons);
 
 			}
 			
 			$s3bubble_video_adverts_accesskey	= get_option("s3bubble_video_adverts_accesskey");
 			$s3bubble_video_adverts_secretkey	= get_option("s3bubble_video_adverts_secretkey");
+			$s3bubble_video_adverts_bar_colours	= get_option("s3bubble_video_adverts_bar_colours");
+			$s3bubble_video_adverts_bar_seeks	= get_option("s3bubble_video_adverts_bar_seeks");
+			$s3bubble_video_adverts_controls_bg	= get_option("s3bubble_video_adverts_controls_bg");
+			$s3bubble_video_adverts_icons	    = get_option("s3bubble_video_adverts_icons");
 
 		?>
 		<div class="wrap">
@@ -343,14 +456,12 @@ if (!class_exists("s3bubble_video_adverts")) {
 			<div id="message" class="updated fade"><p>Please sign up for a S3Bubble account at <a href="https://s3bubble.com" target="_blank">https://s3bubble.com</a></p></div>
 			<div class="metabox-holder has-right-sidebar">
 				<div class="inner-sidebar" style="width:40%">
-					
 					<div class="postbox">
 						<h3 class="hndle">PLEASE USE WYSIWYG EDITOR BUTTONS</h3>
 						<div class="inside">
 							<img style="width: 100%;" src="https://isdcloud.s3.amazonaws.com/wp_editor.png" />
 						</div> 
 					</div>
-					
 					<div class="postbox">
 						<h3 class="hndle">Track Video Analytics</h3>
 						<div class="inside">
@@ -373,7 +484,7 @@ if (!class_exists("s3bubble_video_adverts")) {
 										Are you stuck upgraded and not happy?
 									</h3>
 									<p>If you are stuck at any point or preferred the old version please just click the download below and delete this version and re upload the plugin.</p>
-									<a class="button button-s3bubble" href="https://s3.amazonaws.com/s3bubble.assets/video.adverts/s3bubble-amazon-s3-html-5-video-with-adverts.zip" target="_blank">DOWNLOAD OLD VERISON</a>
+									<a class="button button-s3bubble" href="https://s3.amazonaws.com/s3bubble.assets/video.adverts/s3bubble-amazon-s3-html-5-video-with-adverts.old.zip" target="_blank">DOWNLOAD OLD VERISON</a>
 								</li>
 							</ul>        
 						</div> 
@@ -405,7 +516,7 @@ if (!class_exists("s3bubble_video_adverts")) {
 				<div id="post-body">
 					<div id="post-body-content" style="margin-right: 41%;">
 						<div class="postbox">
-							<h3 class="hndle">Fill in details below if stuck please <a class="button button-s3bubble" style="float: right;margin: -5px -10px;" href="https://www.youtube.com/watch?v=z3DZ1fpXR0I" target="_blank">Watch Video</a></h3>
+							<h3 class="hndle">Fill in details below if stuck please <a class="button button-s3bubble" style="float: right;margin: -5px -10px;" href="https://www.youtube.com/watch?v=VFG3-nvV6F0" target="_blank">Watch Video</a></h3>
 							<div class="inside">
 								<form action="" method="post" class="s3bubble-video-popup-form" style="overflow: hidden;">
 								    <table class="form-table">
@@ -424,6 +535,34 @@ if (!class_exists("s3bubble_video_adverts")) {
 								        	<span class="description">App Secret Key can be found <a href="https://s3bubble.com/admin/#/apps" target="_blank">here</a></span>
 								        </td>
 								      </tr> 
+								      <tr>
+								        <th scope="row" valign="top"><label for="s3bubble_video_adverts_bar_colours">Player Bar Colours:</label></th>
+								        <td> <input type="text" name="s3bubble_video_adverts_bar_colours" id="s3bubble_video_adverts_bar_colours" value="<?php echo $s3bubble_video_adverts_bar_colours; ?>" class="cpa-color-picker" >
+								        	<br />
+								        	<span class="description">Change the progress bar and volume bar colour</span>
+								        </td>
+								      </tr>
+								      <tr>
+								        <th scope="row" valign="top"><label for="s3bubble_video_adverts_bar_seeks">Seek Bar Colours:</label></th>
+								        <td> <input type="text" name="s3bubble_video_adverts_bar_seeks" id="s3bubble_video_adverts_bar_seeks" value="<?php echo $s3bubble_video_adverts_bar_seeks; ?>" class="cpa-color-picker" >
+								        	<br />
+								        	<span class="description">Change the progress bar and volume bar seek bar colours</span>
+								        </td>
+								      </tr>
+								      <tr>
+								        <th scope="row" valign="top"><label for="s3bubble_video_adverts_controls_bg">Player Controls Colour:</label></th>
+								        <td> <input type="text" name="s3bubble_video_adverts_controls_bg" id="s3bubble_video_adverts_controls_bg" value="<?php echo $s3bubble_video_adverts_controls_bg; ?>" class="cpa-color-picker" >
+								        	<br />
+								        	<span class="description">Change the controls background colour</span>
+								        </td>
+								      </tr> 
+								      <tr>
+								        <th scope="row" valign="top"><label for="s3bubble_video_adverts_icons">Player Icon Colours:</label></th>
+								        <td> <input type="text" name="s3bubble_video_adverts_icons" id="s3bubble_video_adverts_icons" value="<?php echo $s3bubble_video_adverts_icons; ?>" class="cpa-color-picker" >
+								        	<br />
+								        	<span class="description">Change the player icons colours</span>
+								        </td>
+								      </tr>  
 								    </table>
 								    <br/>
 								    <span class="submit" style="border: 0;">
@@ -444,56 +583,325 @@ if (!class_exists("s3bubble_video_adverts")) {
 		* @author sameast
 		* @none
 		*/ 
-        function s3bubble_video_adverts_player($atts){
-
-			$s3bubble_access_key = get_option("s3bubble_video_adverts_accesskey");
-			$s3bubble_secret_key = get_option("s3bubble_video_adverts_secretkey");	
-        	extract( shortcode_atts( array(
+        function s3bubble_video_adverts_player($atts){	
+			
+        	// get option from database	
+			$loggedin            = get_option("s3-loggedin");
+			$search              = get_option("s3-search");
+			$responsive          = get_option("s3-responsive");
+			$stream              = get_option("s3-stream");
+	        extract( shortcode_atts( array(
+				'playlist'   => '',
+				'height'     => '',
+				'track'      => '',
 				'bucket'     => '',
-				'key'        => '',
-				'time'       => '',
-				'skip'       => 'false',
-				'autoplay'   => 'false',
+				'folder'     => '',
+				'cloudfront' => '',
+				'download'   => 'false',
 				'aspect'     => '16:9',
-				'advert'     => ''
+				'link'       => '',
+				'responsive' => $responsive,
+				'autoplay'   => 'false',
 			), $atts, 's3bubbleVideoAdvert' ) );
-
-            //set POST variables
-			$url = $this->endpoint . 'wp_adverts/advert';
-			$fields = array(
-				'AccessKey' => $s3bubble_access_key,
-			    'SecretKey' => $s3bubble_secret_key,
-			    'Timezone' => 'America/New_York',
-			    'Bucket' => $bucket,
-			    'Key' => $key
-			);
 			
-			if(!function_exists('curl_version')){
-    			return "<i>Your hosting does not have PHP curl installed. Please install php curl S3Bubble requires PHP curl to work!</i>";
-    			exit();
-    		}
-			
-			//open connection
-			$ch = curl_init();
-			//set the url, number of POST vars, POST data
-			curl_setopt($ch,CURLOPT_URL, $url);
-			curl_setopt($ch,CURLOPT_POST, true);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($ch,CURLOPT_POSTFIELDS, $fields);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-			//execute post
-		   $result = json_decode(curl_exec($ch));
-           $player_id = uniqid();
-		   
-		   if($result[0]->advert){
-		   		$html = '<li data-thumb-source="' . $result[0]->poster . '" data-video-source="' . $result[0]->m4v . '" data-poster-source="' . $result[0]->poster . '" data-downloadable="yes" data-ads-source="' . $result[0]->adverturl . '" data-ads-page-to-open-url="' . $advert . '" data-ads-page-target="_blank" data-time-to-hold-ads="' . $skip . '"></li>';
-		   }else{
-		   		$html = '<li data-thumb-source="' . $result[0]->poster . '" data-video-source="' . $result[0]->m4v . '" data-poster-source="' . $result[0]->poster . '" data-downloadable="yes"></li>';
-		   }
+			// Check download
+			if($loggedin == 'true'){
+				if ( is_user_logged_in() ) {
+					$download = 1;
+				}else{
+					$download = 0;
+				}
+			}
+            $player_id = uniqid();
+		
+            return '<div id="s3bubble-media-main-container-' . $player_id . '" class="s3bubble-media-main-video">
+			    <div id="jquery_jplayer_' . $player_id . '" class="s3bubble-media-main-jplayer"></div>
+			    <div class="s3bubble-media-main-video-skip">
+					<h2>Skip Ad</h2>
+					<i class="s3icon s3icon-step-forward"></i>
+					<img id="s3bubble-media-main-skip-tumbnail" src=""/>
+				</div>
+			    <div class="s3bubble-media-main-video-loading">
+			    	<i class="s3icon s3icon-refresh s3icon-spin"></i>
+			    </div>
+			    <div class="s3bubble-media-main-video-play">
+					<i class="s3icon s3icon-play"></i>
+				</div>
+			    <div class="s3bubble-media-main-gui">
+			        <div class="s3bubble-media-main-interface">
+			            <div class="s3bubble-media-main-controls-holder">
+							<a href="javascript:;" class="s3bubble-media-main-play" tabindex="1"><i class="s3icon s3icon-play"></i></a>
+							<a href="javascript:;" class="s3bubble-media-main-pause" tabindex="1"><i class="s3icon s3icon-pause"></i></a>
+							<div class="s3bubble-media-main-progress" dir="auto">
+							    <div class="s3bubble-media-main-seek-bar" dir="auto">
+							        <div class="s3bubble-media-main-play-bar" dir="auto"><span></span></div>
+							    </div>
+							</div>
+							<a href="javascript:;" class="s3bubble-media-main-full-screen" tabindex="3" title="full screen"><i class="s3icon s3icon-arrows-alt"></i></a>
+							<a href="javascript:;" class="s3bubble-media-main-restore-screen" tabindex="3" title="restore screen"><i class="s3icon s3icon-arrows-alt"></i></a>
+							<div class="s3bubble-media-main-volume-bar" dir="auto">
+							    <div class="s3bubble-media-main-volume-bar-value" dir="auto"><span class="handle"></span></div>
+							</div>
+							<a href="javascript:;" class="s3bubble-media-main-mute" tabindex="2" title="mute"><i class="s3icon s3icon-volume-up"></i></a>
+							<a href="javascript:;" class="s3bubble-media-main-unmute" tabindex="2" title="unmute"><i class="s3icon s3icon-volume-off"></i></a>
+							<div class="s3bubble-media-main-time-container">
+								<div class="s3bubble-media-main-duration"></div>
+							</div>
+			            </div>
+			        </div>
+			    </div>
+			    <div class="s3bubble-media-main-playlist" style="display:none !important;">
+					<ul>
+						<li></li>
+					</ul>
+				</div>
+			    <div class="s3bubble-media-main-no-solution" style="display:none;">
+			        <span>Update Required</span>
+			        Flash player is needed to use this player please download here. <a href="https://get2.adobe.com/flashplayer/" target="_blank">Download</a>
+			    </div>
+			</div>
+            <script type="text/javascript">
+				jQuery(document).ready(function($) {
+					
+					var S3Bucket = "' . $bucket. '";
+					var Current  = -1;
+					var link     = "' . $link . '";
+					var aspects  = "' . $aspect . '";
+					var aspects  = aspects.split(":");
+					var aspect   = $("#s3bubble-media-main-container-' . $player_id . '").width()/aspects[0]*aspects[1];
+				
+					var IsMobile = false;
+					if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+						IsMobile = true;
+					}
+					var videoAdvertS3bubble = new jPlayerPlaylist({
+						jPlayer: "#jquery_jplayer_' . $player_id . '",
+						cssSelectorAncestor: "#s3bubble-media-main-container-' . $player_id . '"
+					}, videoAdvertS3bubble, {
+						playlistOptions : {
+							autoPlay : '.$autoplay.',
+							downloadSet: '.$download.'
+						},
+						ready : function(event) {
+							// Add Responsive
+							var main_width = $("#s3bubble-media-main-container-' . $player_id . '").width();
+							if(main_width < 400){
+								$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-volume-bar").hide();
+								$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-mute").hide();
+								$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-unmute").hide();
+								$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-progress").width(main_width-160);	
+							}else{
+								$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-mute").show();
+								$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-volume-bar").show();
+								$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-progress").width(main_width-280);	
+							}
+							$( window ).resize(function() {
+								var main_width_resize = $("#s3bubble-media-main-container-' . $player_id . '").width();
+								if(main_width_resize < 400){
+									$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-mute").hide();
+									$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-unmute").hide();
+									$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-volume-bar").hide();
+									$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-progress").width(main_width_resize-160);	
+								}else{
+									$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-mute").show();
+									$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-volume-bar").show();
+									$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-progress").width(main_width_resize-280);	
+								}
+							});
+							var sendData = {
+								"action": "s3bubble_video_adverts_internal_ajax",
+								"Timezone":"America/New_York",
+							    "Bucket" : "' . $bucket. '",
+							    "Key" : "' . $track. '",
+							    "Cloudfront" : "' . $cloudfront .'"
+							}
+							$.post("' . admin_url('admin-ajax.php') . '", sendData, function(response) {
+								if(response.error){
+									console.log(response.message);   
+								}else{
+									$("#s3bubble-media-main-container-' . $player_id . ' #s3bubble-media-main-skip-tumbnail").attr("src", response.results[0].poster);
+									videoAdvertS3bubble.setPlaylist(response.results);
+									$("video").bind("contextmenu", function(e) {
+										return false;
+									}); 
+									$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-video-skip").on( "click", function() {
+										$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-video-loading").fadeIn();
+										$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-video-skip").animate({
+										    left: "-230"
+										}, 50, function() {
+										    videoAdvertS3bubble.next();
+										});
+										
+									});
+								}
+							},"json");
+						},
+						timeupdate : function(t) {
+							if (t.jPlayer.status.currentTime > 1) {
+								$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-video-loading").fadeOut();
+							}
+						},
+						resize: function (event) {
+					    	$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-progress").fadeOut();
+					    	setTimeout(function(){
+					    		$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-progress").width($("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-gui").width()-280).fadeIn();	
+					    	},2000);
+					    },
+					    click: function (event) {
+					    	var CurrentState = videoAdvertS3bubble.current;
+							var PlaylistKey  = videoAdvertS3bubble.playlist[CurrentState];
+							if(PlaylistKey.advert && link){
+								var win = window.open(link, "_blank");
+  								win.focus();
+							}else{
+						    	if(event.jPlayer.status.paused){
+						    		videoAdvertS3bubble.play();
+						    	}else{
+						    		videoAdvertS3bubble.pause();
+						    	}
+						    }
+					    },
+					    error: function (event) {
+					    	console.log(event.jPlayer.error);
+        					console.log(event.jPlayer.error.type);
+					    },
+						loadedmetadata : function(t) {
+							$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-video-loading").fadeOut();
+						},
+						loadeddata : function(t) {
+							$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-video-loading").fadeOut();
+						},
+						emptied : function(t) {
+							$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-video-loading").fadeIn()
+						},
+						ended : function(t) {
+							$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-video-loading").fadeIn();
+							var CurrentState = videoAdvertS3bubble.current;
+							var PlaylistKey  = videoAdvertS3bubble.playlist[CurrentState];
+							if(PlaylistKey.advert && IsMobile === false){
+								$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-video-skip").animate({
+								    left: "0"
+								}, 50, function() {
+								    // Animation complete.
+								});
+							}else{
+								$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-video-skip").animate({
+								    left: "-230"
+								}, 50, function() {
+								    
+								});
+							}
+						},
+						stalled : function(t) {
+							$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-video-loading").fadeIn()
+						},
+						waiting: function() {
+							$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-video-loading").fadeIn(); 
+						},
+						canplay: function() {
+							$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-video-loading").fadeOut(); 
+						},
+						pause: function() { 
 
-           return '<script type="text/javascript">jQuery(document).ready(function(o){var e="' . $aspect . '",t=e.split(":"),l=o("#s3bubble-video-' . $player_id . '").width(),n=Math.round(l/t[0]*t[1]);FWDUVPUtils.onReady(function(){new FWDUVPlayer({s3bubbleOnce:!0,s3bubbleBucket:"' . $bucket . '",s3bubbleKey:"' . $key . '",s3bubbleAdvert:"' . $result[0]->advert . '",s3bubbleAppId:s3bubble_advert_object.s3appid,s3bubbleServer:s3bubble_advert_object.serveraddress,instanceName:"player-' . $player_id . '",parentId:"s3bubble-video-' . $player_id . '",playlistsId:"playlists-' . $player_id . '",mainFolderPath:"' . plugins_url('assets/plugins/ultimate/content',__FILE__ ) . '",skinPath:"minimal_skin_dark",displayType:"responsive",facebookAppId:"213684265480896",useDeepLinking:"no",rightClickContextMenu:"developer",addKeyboardSupport:"yes",autoScale:"no",showButtonsToolTip:"yes",stopVideoWhenPlayComplete:"no",autoPlay:"' . $autoplay . '",loop:"no",shuffle:"no",maxWidth:l,maxHeight:n,volume:.8,buttonsToolTipHideDelay:1.5,backgroundColor:"#000000",videoBackgroundColor:"#000000",posterBackgroundColor:"#000000",buttonsToolTipFontColor:"#5a5a5a",showLogo:"no",hideLogoWithController:"yes",logoPosition:"topRight",logoLink:"https://s3bubble.com",logoMargins:5,showPlaylistsButtonAndPlaylists:"no",showPlaylistsByDefault:"no",thumbnailSelectedType:"opacity",startAtPlaylist:0,buttonsMargins:0,thumbnailMaxWidth:350,thumbnailMaxHeight:350,horizontalSpaceBetweenThumbnails:40,verticalSpaceBetweenThumbnails:40,showPlaylistButtonAndPlaylist:"no",showInfoButton:"no",showDownloadButton:"no",showFacebookButton:"no",showEmbedButton:"no",showFullScreenButton:"yes",repeatBackground:"no",controllerHeight:37,controllerHideDelay:3,startSpaceBetweenButtons:10,spaceBetweenButtons:10,scrubbersOffsetWidth:2,mainScrubberOffestTop:16,timeOffsetLeftWidth:2,timeOffsetRightWidth:3,timeOffsetTop:0,volumeScrubberHeight:80,volumeScrubberOfsetHeight:12,timeColor:"#bdbdbd",youtubeQualityButtonNormalColor:"#bdbdbd",youtubeQualityButtonSelectedColor:"#FFFFFF",embedAndInfoWindowCloseButtonMargins:0,borderColor:"#333333",mainLabelsColor:"#FFFFFF",secondaryLabelsColor:"#bdbdbd",shareAndEmbedTextColor:"#5a5a5a",inputBackgroundColor:"#000000",inputColor:"#FFFFFF",openNewPageAtTheEndOfTheAds:"no",adsButtonsPosition:"left",skipToVideoText:"You can skip to video in: ",skipToVideoButtonText:"Skip Ad",adsTextNormalColor:"#bdbdbd",adsTextSelectedColor:"#FFFFFF",adsBorderNormalColor:"#444444",adsBorderSelectedColor:"#FFFFFF"})})});</script>
-			<div id="s3bubble-video-' . $player_id . '"></div><ul id="playlists-' . $player_id . '" style="display:none;"><li data-source="playlist-' . $player_id . '" data-playlist-name="S3Bubble Playlist" data-thumbnail-path="' . $result[0]->poster . '"></li></ul><ul id="playlist-' . $player_id . '" style="display:none;">' . $html . '</ul>';
+						},
+						playing: function() {
+							$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-video-loading").fadeOut(); 
+						},
+						play: function() { 
+						    $("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-video-loading").fadeOut(); 
+							var CurrentState = videoAdvertS3bubble.current;
+							var PlaylistKey  = videoAdvertS3bubble.playlist[CurrentState];
+							if(PlaylistKey.advert && IsMobile === false){
+								$("#s3bubble-media-main-container-' . $player_id . ' .s3bubble-media-main-video-skip").animate({
+								    left: "0"
+								}, 50, function() {
+								    // Animation complete.
+								});
+							}
+							if(Current !== CurrentState){
+								addListener({
+									app_id: s3bubble_advert_object.s3appid,
+									server: s3bubble_advert_object.serveraddress,
+									bucket: "' . $bucket. '",
+									key: PlaylistKey.key,
+									type: "video",
+									advert: false
+								});
+								Current = CurrentState;
+							}
+
+						},
+						suspend: function() { 
+						    
+						},
+						keyBindings: {
+						  play: {
+						    key: 32, // space
+						    fn: function(f) {
+						      if(f.status.paused) {
+						        f.play();
+						      } else {
+						        f.pause();
+						      }
+						    }
+						  },
+						  fullScreen: {
+						    key: 70, // f
+						    fn: function(f) {
+						      if(f.status.video || f.options.audioFullScreen) {
+						        f._setOption("fullScreen", !f.options.fullScreen);
+						      }
+						    }
+						  },
+						  muted: {
+						    key: 77, // m
+						    fn: function(f) {
+						      f._muted(!f.options.muted);
+						    }
+						  },
+						  volumeUp: {
+						    key: 190, // .
+						    fn: function(f) {
+						      f.volume(f.options.volume + 0.1);
+						    }
+						  },
+						  volumeDown: {
+						    key: 188, // ,
+						    fn: function(f) {
+						      f.volume(f.options.volume - 0.1);
+						    }
+						  },
+						  loop: {
+						    key: 76, // l
+						    fn: function(f) {
+						      f._loop(!f.options.loop);
+						    }
+						  }
+						},
+						swfPath: "https://s3.amazonaws.com/s3bubble.davec/jquery.jplayer.swf",
+	                    supplied: "m4v",
+		                wmode: "window",
+		                preload: "metadata",
+						useStateClassSkin: true,
+						autoBlur: false,
+						smoothPlayBar: false,
+						keyEnabled: true,
+						remainingDuration: true,
+						size: {
+				            width: "100%",
+				            height: aspect
+				        },
+				        autohide : {
+							full : true,
+							restored : true,
+							hold : 3000
+						}
+					});
+				});
+			</script>';
+				
 			curl_close($ch);
+
 		}
 
 	}
