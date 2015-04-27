@@ -144,6 +144,10 @@
     background: #6F6F6E;
     bottom: 0
 }
+.s3bubble-media-main-interface > * a:focus {
+    outline: 0;
+    text-decoration: none;
+}
 .s3bubble-media-main-interface-audio-playlist {
     position: relative;
     top: 0
@@ -166,8 +170,8 @@ a.s3bubble-media-main-pause {
     border: none !important;
     vertical-align: middle;
     padding: 0px;
-  margin: 0px;
-  display: block;
+    margin: 0px;
+    display: block;
 }
 .s3bubble-media-main-progress {
     background: #706d6d;
@@ -215,14 +219,16 @@ a.s3bubble-media-main-pause {
     cursor: default;
     -ms-touch-action: none;
     touch-action: none;
+    outline: 0;
 }
 .s3bubble-media-main-play-bar span {
     position: absolute;
-  top: -1px;
-  right: -6px;
-  background: url(../images/handle.png)center no-repeat;
-  width: 12px;
-  height: 13px;
+    top: -1px;
+    right: -6px;
+    background: url(../images/handle.png)center no-repeat;
+    width: 12px;
+    height: 13px;
+    outline: 0;
 }
 .s3bubble-media-main-time-container {
     float: right;
@@ -239,7 +245,8 @@ a.s3bubble-media-main-pause {
     color: #fff;
     border: none !important;
     vertical-align: middle;
-    line-height: 12px
+    line-height: 12px;
+    outline: 0;
 }
 .s3bubble-media-main-current-time {
     float: right;
@@ -266,12 +273,12 @@ a.s3bubble-media-main-pause {
 .s3bubble-media-main-audio a.s3bubble-media-main-unmute {
     float: right;
     height: 35px;
-    outline: none;
     color: #fff;
     border: none !important;
     vertical-align: middle;
     width: 40px;
-    text-align: center
+    text-align: center;
+    outline: 0;
 }
 .s3bubble-media-main-volume-bar {
     float: right;
