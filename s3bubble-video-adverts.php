@@ -818,7 +818,7 @@ if (!class_exists("s3bubble_video_adverts")) {
 								    // Animation complete.
 								});
 							}
-							if(Current !== CurrentState){
+							if(Current !== CurrentState && PlaylistKey.advert !== true){
 								addListener({
 									app_id: s3bubble_advert_object.s3appid,
 									server: s3bubble_advert_object.serveraddress,

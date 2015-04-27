@@ -10,6 +10,9 @@
     box-shadow: 0 0 20px rgba(0, 0, 0, .3);
     overflow: hidden
 }
+.s3bubble-media-main-video > * {
+  outline: 0;
+}
 .s3bubble-media-main-video-360p {
     width: 570px;
     margin: 100px auto
@@ -83,11 +86,13 @@
     margin-left: -58px;
     margin-top: -35px;
     text-align: center;
-    font-size: 40px;
-    line-height: 70px;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px
+}
+.s3bubble-media-main-video-play .s3icon-play {
+  font-size: 35px;
+  line-height: 70px;
 }
 .s3bubble-media-main-video-loading {
     position: absolute;
@@ -99,8 +104,10 @@
     margin-left: -58px;
     margin-top: -35px;
     text-align: center;
-    font-size: 50px;
-    line-height: 70px
+}
+.s3bubble-media-main-video-loading .s3icon-refresh {
+  font-size: 35px;
+  line-height: 70px;
 }
 .s3bubble-media-main-jplayer img {
     max-width: 100% !important;
@@ -157,7 +164,9 @@ a.s3bubble-media-main-pause {
     color: #fff;
     border: none !important;
     vertical-align: middle;
-    line-height: 35px
+    padding: 0px;
+  margin: 0px;
+  display: block;
 }
 .s3bubble-media-main-progress {
     background: #706d6d;
@@ -213,7 +222,6 @@ a.s3bubble-media-main-pause {
   background: url(../images/handle.png)center no-repeat;
   width: 12px;
   height: 13px;
-    z-index: 941;
 }
 .s3bubble-media-main-time-container {
     float: right;
@@ -261,7 +269,6 @@ a.s3bubble-media-main-pause {
     color: #fff;
     border: none !important;
     vertical-align: middle;
-    line-height: 35px;
     width: 40px;
     text-align: center
 }
@@ -308,7 +315,6 @@ a.s3bubble-media-main-pause {
     color: #fff;
     border: none !important;
     vertical-align: middle;
-    line-height: 35px;
     text-align: center
 }
 .s3bubble-rtmp-hide {
@@ -339,6 +345,7 @@ a.s3bubble-media-main-pause {
     list-style: none !important;
     float: left !important;
     width: 100% !important;
+    text-indent: 0px !important;
 }
 .s3bubble-media-main-playlist li {
     width: 100%!important;
@@ -346,21 +353,27 @@ a.s3bubble-media-main-pause {
     border-top: 1px solid #3d3f40!important;
     border-bottom: 1px solid #323334!important;
     background: #3a3b3c!important;
-    height: 30px!important;
+    height: 35px!important;
     float: left!important;
     margin: 0 !important;
     outline: 0 !important;
 }
 .s3bubble-media-main-playlist li div {
     margin: 0 !important;
-    padding: 5px 10px!important;
+    padding: 0px 10px!important;
     outline: 0 !important;
+    line-height: 35px !important;
 }
 .s3bubble-media-main-playlist li div a {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     text-decoration: none;
     color: #d2d6db;
-    border: none
+    border: none;
+    margin: 0px !important;
+    padding: 0px !important;
+    line-height: 33px;
+    font-size: 13px;
+    outline: 0;
 }
 .s3bubble-media-main-no-solution {
     display: block;
@@ -386,10 +399,10 @@ a.s3bubble-media-main-pause {
 }
 .s3bubble-video-playlist-tsearch {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background: url(../images/search-bg.png);
-    background-size: cover;
+    background: url(../images/search-bg.png) !important;
+    background-size: cover !important;
     border-radius: 0!important;
-    width: 280px!important;
+    width: 300px!important;
     height: 36px!important;
     padding: 0px 10px !important;
     font-size: 16px!important;
@@ -401,7 +414,7 @@ a.s3bubble-media-main-pause {
     font-size: 16px !important;
     width: 98% !important;
     border: none !important;
-    height: 20px !important;
+    height: 35px !important;
     padding: 1% !important;
     outline: 0;
     background: #fff !important;
