@@ -1,0 +1,47 @@
+#toplevel_page_s3bubble_video_adverts .wp-menu-image img {
+	padding-top: 6px
+}
+#toplevel_page_s3bubble_video_adverts .wp-menu-name {
+	font-size: 13px
+}
+.s3bubble-adverts li {
+	width: 100%;
+	display: block;
+	height: 135px;
+	clear: both;
+	border-bottom: 1px solid #fafafa
+}
+.s3bubble-adverts li img {
+	float: left;
+	width: 35%;
+	margin-right: 10px
+}
+.s3bubble-adverts li p {
+	margin: 0 0 10px
+}
+.s3bubble-video-popup-form input {
+	height: 33px;
+	border-radius: 8px
+}
+.s3bubble-video-popup-form label {
+	font-style: italic
+}
+.button-s3bubble {
+	background: #1abc9c !important;
+	border: #1abc9c !important;
+	color: #fff !important;
+	padding: 3px 10px !important;
+	border-radius: 5px !important
+}
+
+.s3bubble-video-form-alerts {
+	 background: #61B3E4;
+  width: 100%;
+  height: auto;
+  text-align: center;
+  color: white;
+  padding: 10px 0px 10px 0px;
+  display: block;
+  float: left;
+  margin: 10px 0px;
+}
